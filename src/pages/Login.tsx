@@ -4,12 +4,14 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { User, Loader } from "lucide-react";
 import { API_URL } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const [adminId, setAdminId] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +30,7 @@ const Login = () => {
       });
       const data = await response.json();
       if (data.success) {
+        login();
         navigate("/dashboard");
       } else {
         setError(data.message);

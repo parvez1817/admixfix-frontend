@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
 import { API_URL } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface StudentRequest {
   id: string;
@@ -36,6 +37,7 @@ const AdminDashboard = () => {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   // Fetch both pending and accepted requests from backend
   useEffect(() => {
@@ -142,6 +144,7 @@ const AdminDashboard = () => {
   };
 
   const handleLogout = () => {
+    logout();
     navigate("/");
   };
 
