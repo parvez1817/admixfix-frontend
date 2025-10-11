@@ -145,7 +145,7 @@ const AdminDashboard = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate("/login");
   };
 
   const filteredRequests = (activeTab === "pending" ? requests : acceptedCards).filter((request) => {
