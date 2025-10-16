@@ -24,6 +24,7 @@ interface StudentRequest {
   reason: string;
   status: "pending" | "printed";
   submittedDate: string;
+  createdAt?: string;
 }
 
 const AdminDashboard = () => {
@@ -57,6 +58,7 @@ const AdminDashboard = () => {
           reason: item.reason,
           status: "pending",
           submittedDate: item.createdAt?.split("T")[0] || "N/A",
+          createdAt: item.createdAt,
         }));
         setRequests(formatted);
       })
@@ -77,7 +79,8 @@ const AdminDashboard = () => {
           libraryCode: item.libraryCode,
           reason: item.reason,
           status: "printed",
-          submittedDate: item.acceptedAt?.split("T")[0] || "N/A",
+          submittedDate: item.createdAt?.split("T")[0] || "N/A",
+          createdAt: item.createdAt,
         }));
         setAcceptedCards(formatted);
       })
@@ -182,6 +185,18 @@ const AdminDashboard = () => {
       .map((n) => n[0])
       .join("")
       .toUpperCase();
+  };
+
+  // Helper to format ISO date to YYYY-MM-DD HH:mm
+  const formatDateTime = (iso?: string): string => {
+    if (!iso) return "N/A";
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return "N/A";
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const hours24 = d.getHours();
+    const ampm = hours24 >= 12 ? "PM" : "AM";
+    const hours12 = hours24 % 12 || 12;
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} | ${pad(hours12)}:${pad(d.getMinutes())} ${ampm}`;
   };
 
   return (
@@ -298,11 +313,25 @@ const AdminDashboard = () => {
                       <div className="flex-1"><span className="font-medium text-gray-700">D.O.B:</span> {request.dob}</div>
                       <div className="flex-1"><span className="font-medium text-gray-700">Year & Section:</span> {request.year} Year - {request.section}</div>
                     </div>
-                    <div className="flex flex-col sm:flex-row sm:gap-x-4 gap-y-1">
-                      <div className="flex-1"><span className="font-medium text-gray-700">Library Code:</span> {request.libraryCode}</div>
-                      <div className="flex-1"><span className="font-medium text-gray-700">Register Number:</span> {request.registerNumber}</div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-x-4 gap-y-1">
+                      {/* Left: Library Code */}
+                      <div className="flex items-baseline gap-1">
+                        <span className="font-medium text-gray-700">Library Code:</span>
+                        <span className="text-gray-900">{request.libraryCode}</span>
+                      </div>
+
+                      {/* Right: Register Number (left-aligned to match Year & Section) */}
+                      <div className="flex flex-col items-start leading-tight">
+                        <div className="flex items-baseline gap-1">
+                          <span className="font-medium text-gray-700">Register Number:</span>
+                          <span className="text-gray-900">{request.registerNumber}</span>
+                        </div>
+                      </div>
                     </div>
                     <div className="text-xs sm:text-sm text-gray-700"><span className="font-medium">Reason:</span> {request.reason}</div>
+                    <div className="text-xs sm:text-sm text-gray-700 mt-1">
+                      <span className="font-medium">Date & Time:</span> {request.createdAt ? formatDateTime(request.createdAt) : request.submittedDate}
+                    </div>
                   </div>
                   
                   <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-4">
@@ -360,6 +389,7 @@ const AdminDashboard = () => {
                                   reason: item.reason,
                                   status: "pending",
                                   submittedDate: item.createdAt?.split("T")[0] || "N/A",
+                                  createdAt: item.createdAt,
                                 }));
                                 setRequests(formattedPending);
                               }
@@ -379,7 +409,8 @@ const AdminDashboard = () => {
                                   libraryCode: item.libraryCode,
                                   reason: item.reason,
                                   status: "printed",
-                                  submittedDate: item.acceptedAt?.split("T")[0] || "N/A",
+                                  submittedDate: item.createdAt?.split("T")[0] || "N/A",
+                                  createdAt: item.createdAt,
                                 }));
                                 setAcceptedCards(formattedAccepted);
                               }
