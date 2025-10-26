@@ -21,13 +21,17 @@ const Login = () => {
     }
     setIsLoading(true);
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
       const response = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ adminId }),
+        signal: controller.signal,
       });
+      clearTimeout(timeout);
       const data = await response.json();
       if (data.success) {
         login();
@@ -36,7 +40,11 @@ const Login = () => {
         setError(data.message);
       }
     } catch (err) {
-      setError("An error occurred. Please try again.");
+      if ((err as Error).name === 'AbortError') {
+        setError("Login timed out. Please retry in a few seconds.");
+      } else {
+        setError("An error occurred. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
